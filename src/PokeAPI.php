@@ -10,7 +10,7 @@ use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
  * @author Kévin Bibollet <bibollet.kevin@gmail.com>
  * @license MIT
  */
-class API
+class PokeAPI
 {
     /** @var int The number of result the API will send. */
     protected $limit = 20;
@@ -25,7 +25,7 @@ class API
     protected $useCaching = true;
     /** @var string The caching type the API will use. */
     protected $cachingType = self::CACHE_TYPE_FILE;
-    /** @var int The time during cached files will exist before being overritten. */
+    /** @var int The time during cached files will exist before being overwritten. */
     protected $cacheExpiration = 3600;
     
     const RESOURCE_BERRY = 'berry';
@@ -82,11 +82,30 @@ class API
     const API_URL = 'https://pokeapi.co/api/v2/';
     
     /**
+     * Constructor method.
+     *
+     * @param array|null $options Properties to set at instance creation.
+     */
+    public function __construct(array $options = null)
+    {
+        if ($options)
+        {
+            if (isset($options['limit'])) { $this->limit = $options['limit']; }
+            if (isset($options['offset'])) { $this->offset = $options['offset']; }
+            else if (isset($options['skip'])) { $this->offset = $options['skip']; }
+            if (isset($options['resource'])) { $this->resource = $options['resource']; }
+            if (isset($options['useCaching'])) { $this->useCaching = $options['useCaching']; }
+            if (isset($options['cacheExpiration'])) { $this->cacheExpiration = $options['cacheExpiration']; }
+            if (isset($options['cachingType'])) { $this->cachingType = $options['cachingType']; }
+        }
+    }
+    
+    /**
      * Sets or gets the number of results the API will send.
      *
      * @param int|null $limit The number of results. If null, the method returns the current value.
      *
-     * @return int|API
+     * @return int|PokeAPI
      */
     public function limit(int $limit = null)
     {
@@ -100,7 +119,7 @@ class API
      *
      * @param int|null $offset The number of results. If null, the method returns the current value.
      *
-     * @return int|API
+     * @return int|PokeAPI
      */
     public function offset(int $offset = null)
     {
@@ -110,11 +129,23 @@ class API
     }
     
     /**
+     * Alias for the "offset" method.
+     *
+     * @param int|null $offset The number of results. If null, the method returns the current value.
+     *
+     * @return int|PokeAPI
+     */
+    public function skip(int $skip = null)
+    {
+        return $this->offset($skip);
+    }
+    
+    /**
      * Sets or gets the type of resource the API will send.
      *
      * @param string|null $resource The type of resource. If null, the method returns the current type.
      *
-     * @return string|API
+     * @return string|PokeAPI
      */
     public function resource(string $resource = null)
     {
@@ -148,7 +179,7 @@ class API
      *
      * @param boolean $caching Use the caching system or not.
      *
-     * @return API
+     * @return PokeAPI
      */
     public function setCaching(bool $caching)
     {
@@ -162,7 +193,7 @@ class API
      *
      * @param int|null $expire The amount of time. If null, the method returns the current time.
      *
-     * @return int|API
+     * @return int|PokeAPI
      */
     public function cacheExpiration(int $expire = null)
     {
@@ -244,11 +275,11 @@ class API
         {
             $params = ["limit={$this->limit}", "offset={$this->offset}"];
 
-            $this->url = API::API_URL . $this->resource . '/?' . join('&', $params);
+            $this->url = PokeAPI::API_URL . $this->resource . '/?' . join('&', $params);
         }
         else
         {
-            $this->url = API::API_URL . $this->resource . '/' . $search . '/';
+            $this->url = PokeAPI::API_URL . $this->resource . '/' . $search . '/';
         }
         
         return $this->url;

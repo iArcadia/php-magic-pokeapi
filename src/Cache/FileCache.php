@@ -2,7 +2,7 @@
 
 namespace iArcadia\MagicPokeAPI\Cache;
 
-use iArcadia\MagicPokeAPI\API;
+use iArcadia\MagicPokeAPI\PokeAPI;
 
 /**
  * All file caching related methods.
@@ -15,11 +15,11 @@ class FileCache
     /**
      * Gets a MD5-hashed name from an URL.
      *
-     * @param API $api The API instance which called this method.
+     * @param PokeAPI $api The API instance which called this method.
      *
      * @return string
      */
-    protected static function getFileName(API $api)
+    protected static function getFileName(PokeAPI $api)
     {
         return md5($api->url());
     }
@@ -27,11 +27,11 @@ class FileCache
     /**
      * Gets the storage directory for the caching system.
      *
-     * @param API $api The API instance which called this method;
+     * @param PokeAPI $api The API instance which called this method;
      *
      * @return string
      */
-    protected static function getDirectory(API $api)
+    protected static function getDirectory(PokeAPI $api)
     {
         if (!file_exists('cache')) { mkdir('cache'); }
         if (!file_exists('cache/magicpokeapi')) { mkdir('cache/magicpokeapi'); }
@@ -43,11 +43,11 @@ class FileCache
     /**
      * Gets the relative path of the file.
      *
-     * @param API $api The API instance which called this method.
+     * @param PokeAPI $api The API instance which called this method.
      *
      * @return string
      */
-    protected static function getFilePath(API $api)
+    protected static function getFilePath(PokeAPI $api)
     {
         $fileName = self::getFileName($api);
         $dir = self::getDirectory($api);
@@ -58,11 +58,11 @@ class FileCache
     /**
      * Gets content of already cached data.
      *
-     * @param API $api The API instance which called this method.
+     * @param PokeAPI $api The API instance which called this method.
      *
      * @return string|null
      */
-    public static function get(API $api)
+    public static function get(PokeAPI $api)
     {
         $file = self::getFilePath($api);
         $data = null;
@@ -85,12 +85,12 @@ class FileCache
     /**
      * Creates a file which will store given data.
      *
-     * @param API $api The API instance which called this method.
+     * @param PokeAPI $api The API instance which called this method.
      * @param string $data The given data.
      *
      * @return boolean
      */
-    public static function cache(API $api, $data)
+    public static function cache(PokeAPI $api, $data)
     {
         $file = self::getFilePath($api);
         
