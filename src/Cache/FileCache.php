@@ -33,11 +33,13 @@ class FileCache
      */
     protected static function getDirectory(PokeAPI $api)
     {
-        if (!file_exists('cache')) { mkdir('cache'); }
-        if (!file_exists('cache/magicpokeapi')) { mkdir('cache/magicpokeapi'); }
-        if (!file_exists("cache/magicpokeapi/{$api->resource()}")) { mkdir("cache/magicpokeapi/{$api->resource()}"); }
+        $path = PokeAPI::config('cache.FileCache::storage_path');
         
-        return "cache/magicpokeapi/{$api->resource()}";
+        if (!file_exists($path)) { mkdir($path); }
+        if (!file_exists("{$path}/magicpokeapi")) { mkdir("{$path}/magicpokeapi"); }
+        if (!file_exists("{$path}/magicpokeapi/{$api->resource()}")) { mkdir("{$path}/magicpokeapi/{$api->resource()}"); }
+        
+        return "{$path}/magicpokeapi/{$api->resource()}";
     }
     
     /**
@@ -69,7 +71,7 @@ class FileCache
         
         if (file_exists($file))
         {
-            if (filemtime($file) + $api->cacheExpiration() < time())
+            if (filemtime($file) + PokeAPI::config('cache.expiration_time') < time())
             {
                 unlink($file);
             }

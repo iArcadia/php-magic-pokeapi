@@ -21,13 +21,6 @@ class PokeAPI
     /** @var string The URL used by the last request. */
     protected $url;
     
-    /** @var boolean If the caching system is used or not. */
-    protected $useCaching = true;
-    /** @var string The caching type the API will use. */
-    protected $cachingType = self::CACHE_TYPE_FILE;
-    /** @var int The time during cached files will exist before being overwritten. */
-    protected $cacheExpiration = 3600;
-    
     const RESOURCE_BERRY = 'berry';
     const RESOURCE_BERRY_FIRMNESS = 'berry-firmness';
     const RESOURCE_BERRY_FLAVOR = 'berry-flavor';
@@ -77,8 +70,6 @@ class PokeAPI
     const RESOURCE_TYPE = 'type';
     const RESOURCE_LANGUAGE = 'language';
     
-    const CACHE_TYPE_FILE = 'FileCache';
-    
     const API_URL = 'https://pokeapi.co/api/v2/';
     
     /**
@@ -94,9 +85,6 @@ class PokeAPI
             if (isset($options['offset'])) { $this->offset = $options['offset']; }
             else if (isset($options['skip'])) { $this->offset = $options['skip']; }
             if (isset($options['resource'])) { $this->resource = $options['resource']; }
-            if (isset($options['useCaching'])) { $this->useCaching = $options['useCaching']; }
-            if (isset($options['cacheExpiration'])) { $this->cacheExpiration = $options['cacheExpiration']; }
-            if (isset($options['cachingType'])) { $this->cachingType = $options['cachingType']; }
         }
     }
     
@@ -165,51 +153,23 @@ class PokeAPI
     }
     
     /**
-     * Returns if the caching system will be used.
-     *
-     * @return boolean
-     */
-    public function useCaching()
-    {
-        return $this->useCaching;
-    }
-    
-    /**
-     * Sets if the caching system will be used.
-     *
-     * @param boolean $caching Use the caching system or not.
-     *
-     * @return PokeAPI
-     */
-    public function setCaching(bool $caching)
-    {
-        $this->useCaching = $caching;
-        
-        return $this;
-    }
-    
-    /**
-     * Sets or gets the amount of time in seconds a cache item can exist.
-     *
-     * @param int|null $expire The amount of time. If null, the method returns the current time.
-     *
-     * @return int|PokeAPI
-     */
-    public function cacheExpiration(int $expire = null)
-    {
-        if ($expire) { $this->cacheExpiration = $expire; }
-        
-        return ($expire) ? $this : $this->cacheExpiration;
-    }
-    
-    /**
-     * Gets the class name from the "cachingType" property.
+     * Gets the class used for caching system.
      *
      * @return string
      */
-    protected function getCacheClass()
+    protected static function CacheSystem()
     {
-        return 'iArcadia\MagicPokeAPI\Cache\\' . $this->cachingType;
+        return 'iArcadia\MagicPokeAPI\Cache\\' . self::config('cache.class');
+    }
+    
+    /**
+     * Gets the class used for request system.
+     *
+     * @return string
+     */
+    protected static function RequestSystem()
+    {
+        return 'iArcadia\MagicPokeAPI\Requests\\' . self::config('request.class');
     }
     
     /**
@@ -225,19 +185,19 @@ class PokeAPI
         
         $this->createUrl($search);
         
-        if ($this->useCaching)
+        if (PokeAPI::config('cache.use'))
         {
-            $response = $this->getCacheClass()::get($this);
+            $response = PokeAPI::CacheSystem()::get($this);
             
             if (!$response)
             {
-                $response = $this->sendRequest();
-                $this->getCacheClass()::cache($this, $response);
+                $response = PokeAPI::RequestSystem()::send($this);
+                PokeAPI::CacheSystem()::cache($this, $response);
             }
         }
         else
         {
-            $response = $this->sendRequest();
+            $response = PokeAPI::RequestSystem()::send($this);
         }
         
         return json_decode($response);
@@ -286,31 +246,28 @@ class PokeAPI
     }
     
     /**
-     * Send a HTML request thanks to cURL.
+     * Gets values from a configuration file.
      *
-     * @return string
+     * @param string $config Where to search.
+     *
+     * @return mixed
      */
-    protected function sendRequest()
+    public static function config(string $config)
     {
-        $curl = curl_init();
-        $data = null;
-        $responseCode = null;
+        $path = explode('.', $config);
+        $file = $path[0];
+        $key = (isset($path[1]))
+            ? $path[1]
+            : null;
+        $result = null;
         
-        curl_setopt($curl, CURLOPT_URL, $this->url);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-        
-        $data = curl_exec($curl);
-        $responseCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        
-        curl_close($curl);
-        
-        if ($responseCode !== 200)
+        if (file_exists(__DIR__ . "/config/{$file}.php"))
         {
-            return json_encode('Oops! An error has occured...');
+            $result = require __DIR__ . "/config/{$file}.php";
+            
+            if ($key) { $result = $result[$key]; }
         }
         
-        return $data;
+        return $result;
     }
 }

@@ -38,19 +38,4 @@ $api->resource(PokeAPI::RESOURCE_REGION);
 $region = $api->find(4);
 //var_dump($region);
 
-/* Sets off caching system. (Please, don't.) */
-$api->setCaching(false);
-
-/* Sets alive time of cached files to one month. */
-$api->cacheExpiration(60 * 60 * 24* 30);
-
 //var_dump($api);
-
-$t = new PokeAPI(
-[
-    'limit' => 6,
-    'offset' => 9,
-    'resource' => PokeAPI::RESOURCE_LOCATION
-]);
-
-var_dump($t);
