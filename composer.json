@@ -1,0 +1,23 @@
+{
+    "name": "iarcadia/php-magic-pokeapi",
+    "description": "An awesome PokéAPI PHP wrapper.",
+    "keywords": [
+        "pokemon",
+        "php",
+        "pokeapi"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Bibollet",
+            "email": "bibollet.kevin@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-4": { "iArcadia\\MagicPokeAPI\\": "src/" }
+    },
+    "minimum-stability": "dev"
+}
