@@ -1,7 +1,7 @@
 ## MagicPokeAPI for PHP
-[![Packagist License](https://poser.pugx.org/iarcadia/php-magic-pokeapi/license.png)](http://choosealicense.com/licenses/mit/)
-[![Latest Stable Version](https://poser.pugx.org/iarcadia/php-magic-pokeapi/version.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
-[![Total Downloads](https://poser.pugx.org/iarcadia/php-magic-pokeapi/d/total.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
+[![License](https://poser.pugx.org/iarcadia/php-magic-pokeapi/license)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
+[![Latest Stable Version](https://poser.pugx.org/iarcadia/php-magic-pokeapi/v/stable)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
+[![Total Downloads](https://poser.pugx.org/iarcadia/php-magic-pokeapi/downloads)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
 
 This package is a POO-oriented PHP wrapper for using the RESTful API [PokéAPI](https://pokeapi.co/). With MagicPokeAPI, you can obtain tons of data from PokéAPI server, thanks to some lines. The package include an useful mini caching system.
 
