@@ -168,3 +168,7 @@ $api->resource(PokeAPI::RESOURCE_POKEMON)->find('니드퀸');
 ```
 
 Bonus: even if you use this feature, all english will continue to work!
+
+## CHANGELOGS
+
+See [![CHANGELOGS.md]](https://github.com/iArcadia/php-magic-pokeapi/blob/master/CHANGELOGS.md)
