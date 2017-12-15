@@ -1,9 +1,9 @@
 ## MagicPokeAPI for PHP
-[![License](https://poser.pugx.org/iarcadia/php-magic-pokeapi/license)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
-[![Latest Stable Version](https://poser.pugx.org/iarcadia/php-magic-pokeapi/v/stable)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
-[![Total Downloads](https://poser.pugx.org/iarcadia/php-magic-pokeapi/downloads)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
+[![Packagist License](https://poser.pugx.org/iarcadia/php-magic-pokeapi/license.png)](http://choosealicense.com/licenses/mit/)
+[![Latest Stable Version](https://poser.pugx.org/iarcadia/php-magic-pokeapi/version.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
+[![Total Downloads](https://poser.pugx.org/iarcadia/php-magic-pokeapi/d/total.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
 
-This package is a POO-oriented PHP wrapper for using the RESTful API [PokéAPI](https://pokeapi.co/). With MagicPokeAPI, you can obtain tons of data from PokéAPI server, thanks to some lines. The package include an useful mini caching system.
+This package is a POO-oriented PHP wrapper for using the RESTful API [PokéAPI](https://pokeapi.co/). With MagicPokeAPI, you can obtain tons of data from PokéAPI server, thanks to some lines. The package includes an useful mini caching system.
 
 ## What's PokéAPI?
 
@@ -25,6 +25,8 @@ First of all, you need to check files into the ```config``` folder.
 
 ```request.php``` is request systems related.
 
+```lang.php``` is language systems related.
+
 Please, respect the comments written in these files.
 
 ## Usage
@@ -33,7 +35,7 @@ Please, respect the comments written in these files.
 
 Yep, you probably guess right: you have to create an instance of your favorite PokéAPI wrapper in order to continue.
 
-```
+```php
 $api = new PokeAPI();
 ```
 
@@ -43,13 +45,15 @@ Don't forget to ```include``` files or to ```use``` classes. (e.g. ```use iArcad
 
 You must specify the resource that you want to look for! Use the ```resource()``` method.
 
-```
+```php
 $api->resource('pokemon');
 // or (and the recommended one)
 $api->resource(PokeAPI::RESOURCE_POKEMON);
 ```
 
-The ```PokeAPI``` class provides a constant for all resources. It could be a good idea to use them instead of direct string.
+The ```PokeAPI``` class provides constants for all resources. It could be a good idea to use them instead of direct string.
+
+A constant list is available in ```src/PokeAPI.php``` file.
 
 ### Endpoints
 
@@ -57,7 +61,7 @@ The ```PokeAPI``` class provides a constant for all resources. It could be a goo
 
 Use the ```limit()``` method.
 
-```
+```php
 $api->limit(20);
 ```
 
@@ -65,7 +69,7 @@ $api->limit(20);
 
 Use the ```offset()``` or the ```skip()``` method.
 
-```
+```php
 $api->offset(5);
 // or
 $api->skip(5);
@@ -77,7 +81,7 @@ The ```skip()``` method is an alias for the ```offset()``` one.
 
 Use the ```get()``` method.
 
-```
+```php
 $data = $api->get();
 ```
 
@@ -85,12 +89,41 @@ $data = $api->get();
 
 Very simple, just use the ```find()``` method.
 
-```
+```php
 // by name
 $item = $api->find('arcanine');
 // or by id
 $item = $api->find(25);
 ```
+
+### Other
+
+### Requesting raw URLs
+
+You want to directly write your URL? Use the ```raw()``` method.
+
+```php
+// endpoint
+$api->raw('/ability/');
+// with parameters
+$api->raw('/pokemon-species/?limit=30&offset=60);
+// resource details
+$api->raw('/pokemon/bulbasaur/');
+// with full URL
+$api->raw('https://www.pokeapi.co/api/v2/item/203');
+```
+
+Note that after using it, your ```PokeAPI``` object properties (url, resource, limit and offset) will be updated from your raw URL.
+
+### Forcing the cache update
+
+If a reason, you want to force the update of a cached file, use the ```cacheForcing()``` method.
+
+```php
+$api->cacheForcing(true);
+```
+
+It will update the cache for the next request ONLY.
 
 ## Tips
 
@@ -98,7 +131,7 @@ $item = $api->find(25);
 
 Thanks to the power of the POO, you can quickly set up options between two different requests.
 
-```
+```php
 // for endpoint
 $api->limit(20)->offset(60)->resource(PokeAPI::RESOURCE_ITEM')->get();
 // for resource details
@@ -109,7 +142,7 @@ $api->resource(PokeAPI::RESOURCE_ITEM)->find('potion');
 
 If you prefer, you can also set up options at the instance creation (if you know that they won't change for example).
 
-```
+```php
 $api = new PokeApi(
 [
     'limit' => 20,
@@ -117,3 +150,19 @@ $api = new PokeApi(
     'resource' => PokeAPI::RESOURCE_CONTEST_EFFECT
 ]);
 ```
+
+### Using automatic resource name translation
+
+If you decide to activate the automatic resource name translation (in the ```config/lang.php``` file), you will be able to use your language name for requesting data!
+
+```php
+// Charizard in french will be translated to:
+// $api->resource(PokeAPI::RESOURCE_POKEMON)->find('charizard');
+$api->resource(PokeAPI::RESOURCE_POKEMON)->find('dracaufeu');
+
+// Nidoqueen in korean will be translated to:
+// $api->resource(PokeAPI::RESOURCE_POKEMON)->find('nidoqueen');
+$api->resource(PokeAPI::RESOURCE_POKEMON)->find('니드퀸');
+```
+
+Bonus: even if you use this feature, all english will continue to work!
