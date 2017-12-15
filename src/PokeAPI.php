@@ -4,6 +4,8 @@ namespace iArcadia\MagicPokeAPI;
 
 use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
 
+use iArcadia\MagicPokeAPI\Helpers\URLBuilder;
+
 /**
  * Constructs URL and HTTP Requests in order to get data.
  *
@@ -12,16 +14,10 @@ use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
  */
 class PokeAPI
 {
-    /** @var int The number of result the API will send. */
-    protected $limit = 20;
-    /** @var int The number of result the API will skip. */
-    protected $offset = 0;
-    /** @var string The last used type of resource. */
-    protected $resource;
-    /** @var string The URL used by the last request. */
-    protected $url;
     /** @var bool If the next request will force the update of cache. */
-    protected $cacheForcing = false;
+    public $cacheForcing = false;
+    
+    protected $URLBuilder;
     
     const RESOURCE_BERRY = 'berry';
     const RESOURCE_BERRY_FIRMNESS = 'berry-firmness';
@@ -81,12 +77,59 @@ class PokeAPI
      */
     public function __construct(array $options = null)
     {
+        $this->URLBuilder = new URLBuilder;
+        
         if ($options)
         {
             if (isset($options['limit'])) { $this->limit = $options['limit']; }
             if (isset($options['offset'])) { $this->offset = $options['offset']; }
             else if (isset($options['skip'])) { $this->offset = $options['skip']; }
             if (isset($options['resource'])) { $this->resource = $options['resource']; }
+        }
+    }
+    
+    /**
+     * Getting properties method override.
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        switch ($name)
+        {
+            case 'limit':
+            case 'offset':
+            case 'resource':
+            case 'url':
+                return $this->URLBuilder->$name;
+                break;
+                
+            default:
+                return $this->$name;
+        }
+    }
+    
+    /**
+     * Setting properties method override.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set(string $name, $value)
+    {
+        switch ($name)
+        {
+            case 'limit':
+            case 'offset':
+            case 'resource':
+            case 'url':
+                $this->URLBuilder->$name = $value;
+                break;
+                
+            default:
+                $this->$name = $value;
         }
     }
     
@@ -145,16 +188,6 @@ class PokeAPI
     }
     
     /**
-     * Gets the URL used by the last request.
-     *
-     * @return string|null
-     */
-    public function url()
-    {
-        return $this->url;
-    }
-    
-    /**
      * Sets the forcing of the cache update for the next request.
      *
      * @return PokeAPI
@@ -197,8 +230,15 @@ class PokeAPI
     {
         $response = null;
         
-        if (!$url) { $this->createUrl($search); }
-        else { $this->url = $url; }
+        if (!$url)
+        {
+            $this->URLBuilder->build($search);
+        }
+        else
+        { 
+            $this->url = $url;
+            $this->URLBuilder->buildRaw();
+        }
         
         if (PokeAPI::config('cache.use'))
         {
@@ -240,68 +280,13 @@ class PokeAPI
     /**
      * Uses custom URL(s) for the next request.
      *
-     * @param string|array $url The URL(s) to use.
-     *
      * @return string
      */
-    public function raw($url)
+    public function raw(...$urls)
     {
-        $args = func_get_args();
-        
-        if (is_array($url)) { return $this->manyRaw($url); }
-        else if (sizeof($args) > 1)
-        {
-            return $this->manyRaw($args);
-        }
-        else
-        {
-            if (!preg_match('/^https/', $url))
-            {
-                $url = trim($url, '/');
-                $url = PokeAPI::API_URL . $url;
-            }
-
-            /*
-             * Checks for resource details URL.
-             */
-            if (preg_match('/' . str_replace('/', '\/', PokeAPI::API_URL) . '([a-z-]+)\/[a-z0-9-]+/', $url, $matches))
-            {
-                if (isset($matches[1]))
-                {
-                    $this->resource = $matches[1];
-                }
-            }
-
-            /*
-             * Checks for endpoint URL.
-             */
-            if (preg_match('/' . str_replace('/', '\/', PokeAPI::API_URL) . '([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
-            {
-                if (isset($matches[1]))
-                {
-                    $this->resource = $matches[1];
-
-                    if (isset($matches[2]))
-                    {
-                        $params = explode('&', $matches[2]);
-                        $decomposedParams = [];
-
-                        foreach ($params as $param)
-                        {
-                            $decomposedParams[] = explode('=', $param);
-                        }
-
-                        foreach ($decomposedParams as $param)
-                        {
-                            if ($param[0] == 'limit') { $this->limit = $param[1]; }
-                            if ($param[0] == 'offset') { $this->offset = $param[1]; }
-                        }
-                    }
-                }
-            }
-
-            return $this->get(null, $url);
-        }
+        if (empty($urls)) { return null; }
+        if (sizeof($urls) === 1) { return $this->get(null, $urls[0]); }
+        else { return $this->manyRaw($urls); }
     }
     
     /**

@@ -38,9 +38,8 @@ class FileCache
         
         if (!file_exists($path)) { mkdir($path); }
         if (!file_exists("{$path}/magicpokeapi")) { mkdir("{$path}/magicpokeapi"); }
-        if (!file_exists("{$path}/magicpokeapi/{$api->resource()}")) { mkdir("{$path}/magicpokeapi/{$api->resource()}"); }
         
-        return "{$path}/magicpokeapi/{$api->resource()}";
+        return "{$path}/magicpokeapi";
     }
     
     /**
@@ -56,9 +55,8 @@ class FileCache
         
         if (!file_exists($path)) { mkdir($path); }
         if (!file_exists("{$path}/magicpokeapi/images")) { mkdir("{$path}/magicpokeapi/images"); }
-        if (!file_exists("{$path}/magicpokeapi/images/{$api->resource()}")) { mkdir("{$path}/magicpokeapi/images/{$api->resource()}"); }
         
-        return "{$path}/magicpokeapi/images/{$api->resource()}";
+        return "{$path}/magicpokeapi/images";
     }
     
     /**
@@ -70,7 +68,7 @@ class FileCache
      */
     protected static function getFilePath(PokeAPI $api)
     {
-        $fileName = self::getFileName($api->url());
+        $fileName = self::getFileName($api->url);
         $dir = self::getDirectory($api);
         $ext = PokeAPI::config('cache.FileCache::ext');
         

@@ -112,16 +112,11 @@ $api->raw('/pokemon/bulbasaur/');
 // with full URL
 $api->raw('https://www.pokeapi.co/api/v2/item/203');
 ```
-You can specify many URLs with an array, or with many arguments.
+You can specify many URLs with many arguments.
 
 ```php
-// array way
-$api->raw(['/ability/', 'https://www.pokeapi.co/api/v2/item/203']);
-// many args way
 $api->raw('/ability/', 'https://www.pokeapi.co/api/v2/item/203');
 ```
-
-Note that after using it, your ```PokeAPI``` object properties (url, resource, limit and offset) will be updated from your raw URL (or the last one if you specifies many URLs).
 
 ### Forcing the cache update
 

@@ -7,6 +7,8 @@ require_once('vendor/autoload.php');
 
 require_once('../src/PokeAPI.php');
 
+require_once('../src/Helpers/URLBuilder.php');
+
 require_once('../src/Requests/CURL.php');
 require_once('../src/Requests/File.php');
 

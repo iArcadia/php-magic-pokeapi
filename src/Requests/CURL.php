@@ -28,7 +28,7 @@ class CURL
         $data = null;
         $responseCode = null;
         
-        curl_setopt($curl, CURLOPT_URL, $api->url());
+        curl_setopt($curl, CURLOPT_URL, $api->url);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, PokeAPI::config('request.timeout'));
