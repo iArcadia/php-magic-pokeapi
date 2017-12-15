@@ -246,7 +246,13 @@ class PokeAPI
      */
     public function raw($url)
     {
+        $args = func_get_args();
+        
         if (is_array($url)) { return $this->manyRaw($url); }
+        else if (sizeof($args) > 1)
+        {
+            return $this->manyRaw($args);
+        }
         else
         {
             if (!preg_match('/^https/', $url))
@@ -258,7 +264,7 @@ class PokeAPI
             /*
              * Checks for resource details URL.
              */
-            if (preg_match('/.+\/([a-z-]+)\/[a-z0-9-]+\//', $url, $matches))
+            if (preg_match('/' . str_replace('/', '\/', PokeAPI::API_URL) . '([a-z-]+)\/[a-z0-9-]+/', $url, $matches))
             {
                 if (isset($matches[1]))
                 {
@@ -269,7 +275,7 @@ class PokeAPI
             /*
              * Checks for endpoint URL.
              */
-            if (preg_match('/.+\/([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
+            if (preg_match('/' . str_replace('/', '\/', PokeAPI::API_URL) . '([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
             {
                 if (isset($matches[1]))
                 {
