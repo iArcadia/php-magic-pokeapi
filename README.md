@@ -106,7 +106,7 @@ You want to directly write your URL? Use the ```raw()``` method.
 // endpoint
 $api->raw('/ability/');
 // with parameters
-$api->raw('/pokemon-species/?limit=30&offset=60);
+$api->raw('/pokemon-species/?limit=30&offset=60');
 // resource details
 $api->raw('/pokemon/bulbasaur/');
 // with full URL
@@ -133,7 +133,7 @@ Thanks to the power of the POO, you can quickly set up options between two diffe
 
 ```php
 // for endpoint
-$api->limit(20)->offset(60)->resource(PokeAPI::RESOURCE_ITEM')->get();
+$api->limit(20)->offset(60)->resource(PokeAPI::RESOURCE_ITEM)->get();
 // for resource details
 $api->resource(PokeAPI::RESOURCE_ITEM)->find('potion');
 ```
@@ -152,6 +152,8 @@ $api = new PokeApi(
 ```
 
 ### Using automatic resource name translation
+
+/!\ CURRENTLY ONLY WORK WITH POKEMON NAME /!\
 
 If you decide to activate the automatic resource name translation (in the ```config/lang.php``` file), you will be able to use your language name for requesting data!
 
