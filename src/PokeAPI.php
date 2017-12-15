@@ -16,7 +16,7 @@ class PokeAPI
     protected $limit = 20;
     /** @var int The number of result the API will skip. */
     protected $offset = 0;
-    /** @var string The type of resource. */
+    /** @var string The last used type of resource. */
     protected $resource;
     /** @var string The URL used by the last request. */
     protected $url;
@@ -238,60 +238,83 @@ class PokeAPI
     }
     
     /**
-     * Uses custom URL for the next request.
+     * Uses custom URL(s) for the next request.
      *
-     * @param string $url The URL to use.
+     * @param string|array $url The URL(s) to use.
      *
      * @return string
      */
-    public function raw(string $url)
+    public function raw($url)
     {
-        if (!preg_match('/^https/', $url))
+        if (is_array($url)) { return $this->manyRaw($url); }
+        else
         {
-            $url = trim($url, '/');
-            $url = PokeAPI::API_URL . $url;
-        }
-        
-        /*
-         * Checks for resource details URL.
-         */
-        if (preg_match('/.+\/([a-z-]+)\/[a-z0-9-]+\//', $url, $matches))
-        {
-            if (isset($matches[1]))
+            if (!preg_match('/^https/', $url))
             {
-                $this->resource = $matches[1];
+                $url = trim($url, '/');
+                $url = PokeAPI::API_URL . $url;
             }
-        }
-        
-        /*
-         * Checks for endpoint URL.
-         */
-        if (preg_match('/.+\/([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
-        {
-            if (isset($matches[1]))
+
+            /*
+             * Checks for resource details URL.
+             */
+            if (preg_match('/.+\/([a-z-]+)\/[a-z0-9-]+\//', $url, $matches))
             {
-                $this->resource = $matches[1];
-                
-                if (isset($matches[2]))
+                if (isset($matches[1]))
                 {
-                    $params = explode('&', $matches[2]);
-                    $decomposedParams = [];
-                    
-                    foreach ($params as $param)
+                    $this->resource = $matches[1];
+                }
+            }
+
+            /*
+             * Checks for endpoint URL.
+             */
+            if (preg_match('/.+\/([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
+            {
+                if (isset($matches[1]))
+                {
+                    $this->resource = $matches[1];
+
+                    if (isset($matches[2]))
                     {
-                        $decomposedParams[] = explode('=', $param);
-                    }
-                    
-                    foreach ($decomposedParams as $param)
-                    {
-                        if ($param[0] == 'limit') { $this->limit = $param[1]; }
-                        if ($param[0] == 'offset') { $this->offset = $param[1]; }
+                        $params = explode('&', $matches[2]);
+                        $decomposedParams = [];
+
+                        foreach ($params as $param)
+                        {
+                            $decomposedParams[] = explode('=', $param);
+                        }
+
+                        foreach ($decomposedParams as $param)
+                        {
+                            if ($param[0] == 'limit') { $this->limit = $param[1]; }
+                            if ($param[0] == 'offset') { $this->offset = $param[1]; }
+                        }
                     }
                 }
             }
+
+            return $this->get(null, $url);
+        }
+    }
+    
+    /**
+     * Returns an array of results got with raw() method.
+     *
+     * @param array $urls The URLs to use.
+     *
+     * @return array
+     */
+    protected function manyRaw(array $urls)
+    {
+        $results = [];
+        
+        foreach ($urls as $url)
+        {
+            $results[] = $this->raw($url);
         }
         
-        return $this->get(null, $url);
+        return $results;
     }
     
     /**
