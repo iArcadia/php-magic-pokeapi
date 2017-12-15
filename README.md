@@ -3,7 +3,7 @@
 [![Latest Stable Version](https://poser.pugx.org/iarcadia/php-magic-pokeapi/version.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
 [![Total Downloads](https://poser.pugx.org/iarcadia/php-magic-pokeapi/d/total.png)](https://packagist.org/packages/iarcadia/php-magic-pokeapi)
 
-This package is a POO-oriented PHP wrapper for using the *version 2* of the RESTful API [PokéAPI](https://pokeapi.co/). With MagicPokeAPI, you can obtain tons of data from PokéAPI server, thanks to some lines. The package includes an useful mini caching system.
+This package is a POO-oriented PHP wrapper for using the **version 2** of the RESTful API [PokéAPI](https://pokeapi.co/). With MagicPokeAPI, you can obtain tons of data from PokéAPI server, thanks to some lines. The package includes an useful mini caching system.
 
 ## What's PokéAPI?
 
