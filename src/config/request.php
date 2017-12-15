@@ -10,12 +10,4 @@ return
      * - 'File' for using "file_get_contents" default method.
      */
     'class' => 'CURL',
-    
-    /*
-     *
-     *
-     * Only for: CURL
-     * Value type: int
-     */
-    'timeout' => 5,
 ];

@@ -5,6 +5,7 @@ namespace iArcadia\MagicPokeAPI;
 use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
 
 use iArcadia\MagicPokeAPI\Helpers\URLBuilder;
+use iArcadia\MagicPokeAPI\Helpers\Config;
 
 /**
  * Constructs URL and HTTP Requests in order to get data.
@@ -206,7 +207,7 @@ class PokeAPI
      */
     public static function CacheSystem()
     {
-        return 'iArcadia\MagicPokeAPI\Cache\\' . self::config('cache.class');
+        return 'iArcadia\MagicPokeAPI\Cache\\' . Config::get('cache.class');
     }
     
     /**
@@ -216,7 +217,7 @@ class PokeAPI
      */
     public static function RequestSystem()
     {
-        return 'iArcadia\MagicPokeAPI\Requests\\' . self::config('request.class');
+        return 'iArcadia\MagicPokeAPI\Requests\\' . Config::get('request.class');
     }
     
     /**
@@ -240,7 +241,7 @@ class PokeAPI
             $this->URLBuilder->buildRaw();
         }
         
-        if (PokeAPI::config('cache.use'))
+        if (Config::get('cache.use'))
         {
             $response = PokeAPI::CacheSystem()::get($this);
             
@@ -269,7 +270,7 @@ class PokeAPI
      */
     public function find($search)
     {
-        if (PokeAPI::config('lang.use'))
+        if (Config::get('lang.use'))
         {
             $search = PokeAPI::lang($search);
         }
@@ -309,66 +310,6 @@ class PokeAPI
     }
     
     /**
-     * Creates the URL that will be used in the next request.
-     *
-     * @throws PokeApiException if no resource type has been provided.
-     *
-     * @param string $search This parameter is checked in order to know if it is an endpoint or a specific item.
-     *
-     * @return string
-     */
-    protected function createUrl($search = null)
-    {
-        if (!$this->resource)
-        {
-            throw new PokeApiException('A PokeAPI resource is needed in order to access the API.', 500);
-        }
-        
-        if (!$search)
-        {
-            $params = ["limit={$this->limit}", "offset={$this->offset}"];
-
-            $this->url = PokeAPI::API_URL . $this->resource . '/?' . join('&', $params);
-        }
-        else
-        {
-            $this->url = PokeAPI::API_URL . $this->resource . '/' . $search . '/';
-        }
-        
-        return $this->url;
-    }
-    
-    /**
-     * Gets values from a configuration file.
-     *
-     * @param string $config Where to search.
-     *
-     * @return mixed
-     */
-    public static function config(string $config)
-    {
-        $path = explode('.', $config);
-        $file = $path[0];
-        $key = (isset($path[1]))
-            ? $path[1]
-            : null;
-        $result = null;
-        
-        if (file_exists(__DIR__ . "/config/{$file}.php"))
-        {
-            $result = require __DIR__ . "/config/{$file}.php";
-            
-            if ($key) { $result = $result[$key]; }
-        }
-        else
-        {
-            throw new PokeApiFileException('Impossible to get the wanted configuration because ' . __DIR__ . "/config/{$file}.php does not exist.", 500);
-        }
-        
-        return $result;
-    }
-    
-    /**
      * Gets values from a language file.
      *
      * @param string $search Where to search.
@@ -382,7 +323,7 @@ class PokeAPI
         $key = (isset($path[1]))
             ? $path[1]
             : null;*/
-        $file = PokeAPI::config('lang.lang');
+        $file = Config::get('lang.lang');
         $result = null;
         
         if (file_exists(__DIR__ . "/lang/{$file}.php"))

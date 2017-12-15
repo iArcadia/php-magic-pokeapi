@@ -3,6 +3,7 @@
 namespace iArcadia\MagicPokeAPI\Cache;
 
 use iArcadia\MagicPokeAPI\PokeAPI;
+use iArcadia\MagicPokeAPI\Helpers\Config;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -34,7 +35,7 @@ class FileCache
      */
     protected static function getDirectory(PokeAPI $api)
     {
-        $path = PokeAPI::config('cache.FileCache::storage_path');
+        $path = Config::get('cache.file.storage_path');
         
         if (!file_exists($path)) { mkdir($path); }
         if (!file_exists("{$path}/magicpokeapi")) { mkdir("{$path}/magicpokeapi"); }
@@ -51,7 +52,7 @@ class FileCache
      */
     protected static function getImageDirectory(PokeAPI $api)
     {
-        $path = PokeAPI::config('cache.FileCache::storage_path');
+        $path = Config::get('cache.file.storage_path');
         
         if (!file_exists($path)) { mkdir($path); }
         if (!file_exists("{$path}/magicpokeapi/images")) { mkdir("{$path}/magicpokeapi/images"); }
@@ -70,7 +71,7 @@ class FileCache
     {
         $fileName = self::getFileName($api->url);
         $dir = self::getDirectory($api);
-        $ext = PokeAPI::config('cache.FileCache::ext');
+        $ext = Config::get('cache.file.extension');
         
         return "{$dir}/{$fileName}.{$ext}";
     }
@@ -105,7 +106,7 @@ class FileCache
         
         if (file_exists($file))
         {
-            if (filemtime($file) + PokeAPI::config('cache.expiration_time') < time()
+            if (filemtime($file) + Config::get('cache.expiration_time') < time()
                 || $api->cacheForcing())
             {
                 unlink($file);
@@ -114,7 +115,7 @@ class FileCache
             {
                 $data = file_get_contents($file);
                 
-                switch (PokeAPI::config('cache.FileCache::ext'))
+                switch (Config::get('cache.file.format'))
                 {
                     case 'json': $data = self::parseJson($data); break;
                     case 'yaml': $data = self::parseYaml($data); break;
@@ -139,7 +140,7 @@ class FileCache
         
         self::cacheImages($api, $data);
         
-        switch (PokeAPI::config('cache.FileCache::ext'))
+        switch (Config::get('cache.file.format'))
         {
             case 'json': $data = self::cacheJson($data); break;
             case 'yaml': $data = self::cacheYaml($data); break;
@@ -153,7 +154,7 @@ class FileCache
      */
     public static function clear()
     {
-        $path = PokeAPI::config('cache.FileCache::storage_path');
+        $path = Config::get('cache.file.storage_path');
         
         if (!file_exists($path)) { mkdir($path); }
         else

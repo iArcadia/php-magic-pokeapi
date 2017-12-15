@@ -28,20 +28,31 @@ return
     'expiration_time' => 60 * 60 * 24 * 30,
     
     /*
-     * Your storage path for cached files.
-     *
-     * Only for: FileCache
-     * Value type: string
+     * Configuration of file system.
      */
-    'FileCache::storage_path' => 'cache',
-    
-    /*
-     * The extension used by cached files.
-     *
-     * Only for: FileCache
-     * Value type: string
-     * - json
-     * - yaml
-     */
-    'FileCache::ext' => 'json',
+    'file' =>
+    [
+        /*
+         * Your storage path for cached files.
+         *
+         * Value type: string
+         */
+        'storage_path' => 'cache',
+
+        /*
+         * The format used by cached files.
+         *
+         * Value type: string
+         * - json
+         * - yaml
+         */
+        'format' => 'json',
+        
+        /*
+         * The extension used by cached files.
+         *
+         * Value type: string
+         */
+        'extension' => 'json',
+    ],
 ];
