@@ -1,5 +1,21 @@
 ## CHANGELOGS
 
+### v1.2.0 | 2017-12-15
+
+#### PokeAPI
+
+- Add multi requests in one method using direct URLs
+```php
+// Getting item #2 and #6 (array way):
+$api->raw(['item/2', 'item/6']);
+// Getting pokemon #151 and charizard information (many arguments way):
+$api->raw('pokemon/151', 'https://www.pokeapi.co/api/v2/pokemon/charizard');
+```
+
+#### Bug corrections
+
+- Image caching with ```raw()``` method now stores images in the right place
+
 ### v1.1.0 | 2017-12-15
 
 #### PokeAPI
