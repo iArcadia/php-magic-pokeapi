@@ -3,12 +3,18 @@
 /*
  * Autoloading of all MagicPokeAPI files.
  */
-require_once('Autoload.php');
+require_once('vendor/autoload.php');
 
-foreach (Autoload::load('../src/') as $file)
-{
-    require_once($file);
-}
+require_once('../src/PokeAPI.php');
+
+require_once('../src/Requests/CURL.php');
+require_once('../src/Requests/File.php');
+
+require_once('../src/Cache/FileCache.php');
+
+require_once('../src/Exceptions/PokeApiException.php');
+require_once('../src/Exceptions/PokeApiCUrlException.php');
+require_once('../src/Exceptions/PokeApiFileException.php');
 /* End autoloading */
 
 use iArcadia\MagicPokeAPI\PokeAPI;
@@ -34,6 +40,7 @@ $berries = $api->get();
 //var_dump($berries);
 
 /* Gets from PokeAPI server, data of the region of ID 4. */
+$api->cacheForcing(true);
 $api->resource(PokeAPI::RESOURCE_REGION);
 $region = $api->find(4);
 //var_dump($region);

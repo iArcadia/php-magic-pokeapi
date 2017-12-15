@@ -20,6 +20,8 @@ class PokeAPI
     protected $resource;
     /** @var string The URL used by the last request. */
     protected $url;
+    /** @var bool If the next request will force the update of cache. */
+    protected $cacheForcing = false;
     
     const RESOURCE_BERRY = 'berry';
     const RESOURCE_BERRY_FIRMNESS = 'berry-firmness';
@@ -97,9 +99,9 @@ class PokeAPI
      */
     public function limit(int $limit = null)
     {
-        if ($limit) { $this->limit = $limit; }
+        if ($limit !== null) { $this->limit = $limit; }
         
-        return ($limit) ? $this : $this->limit ;
+        return ($limit !== null) ? $this : $this->limit ;
     }
     
     /**
@@ -111,9 +113,9 @@ class PokeAPI
      */
     public function offset(int $offset = null)
     {
-        if ($offset) { $this->offset = $offset; }
+        if ($offset !== null) { $this->offset = $offset; }
         
-        return ($offset) ? $this : $this->offset;
+        return ($offset !== null) ? $this : $this->offset;
     }
     
     /**
@@ -153,11 +155,23 @@ class PokeAPI
     }
     
     /**
+     * Sets the forcing of the cache update for the next request.
+     *
+     * @return PokeAPI
+     */
+    public function cacheForcing(bool $force = null)
+    {
+        if ($force !== null) { $this->cacheForcing = $force; }
+        
+        return ($force !== null) ? $this : $this->cacheForcing;
+    }
+    
+    /**
      * Gets the class used for caching system.
      *
      * @return string
      */
-    protected static function CacheSystem()
+    public static function CacheSystem()
     {
         return 'iArcadia\MagicPokeAPI\Cache\\' . self::config('cache.class');
     }
@@ -167,7 +181,7 @@ class PokeAPI
      *
      * @return string
      */
-    protected static function RequestSystem()
+    public static function RequestSystem()
     {
         return 'iArcadia\MagicPokeAPI\Requests\\' . self::config('request.class');
     }
@@ -179,11 +193,12 @@ class PokeAPI
      *
      * @return string
      */
-    public function get($search = null)
+    public function get($search = null, string $url = null)
     {
         $response = null;
         
-        $this->createUrl($search);
+        if (!$url) { $this->createUrl($search); }
+        else { $this->url = $url; }
         
         if (PokeAPI::config('cache.use'))
         {
@@ -200,7 +215,9 @@ class PokeAPI
             $response = PokeAPI::RequestSystem()::send($this);
         }
         
-        return json_decode($response);
+        $this->cacheForcing(false);
+        
+        return (is_string($response)) ? json_decode($response) : $response;
     }
     
     /**
@@ -212,7 +229,69 @@ class PokeAPI
      */
     public function find($search)
     {
+        if (PokeAPI::config('lang.use'))
+        {
+            $search = PokeAPI::lang($search);
+        }
+        
         return $this->get($search);
+    }
+    
+    /**
+     * Uses custom URL for the next request.
+     *
+     * @param string $url The URL to use.
+     *
+     * @return string
+     */
+    public function raw(string $url)
+    {
+        if (!preg_match('/^https/', $url))
+        {
+            $url = trim($url, '/');
+            $url = PokeAPI::API_URL . $url;
+        }
+        
+        /*
+         * Checks for resource details URL.
+         */
+        if (preg_match('/.+\/([a-z-]+)\/[a-z0-9-]+\//', $url, $matches))
+        {
+            if (isset($matches[1]))
+            {
+                $this->resource = $matches[1];
+            }
+        }
+        
+        /*
+         * Checks for endpoint URL.
+         */
+        if (preg_match('/.+\/([a-z-]+)\/\?([a-z0-9=&-]+)/', $url, $matches))
+        {
+            if (isset($matches[1]))
+            {
+                $this->resource = $matches[1];
+                
+                if (isset($matches[2]))
+                {
+                    $params = explode('&', $matches[2]);
+                    $decomposedParams = [];
+                    
+                    foreach ($params as $param)
+                    {
+                        $decomposedParams[] = explode('=', $param);
+                    }
+                    
+                    foreach ($decomposedParams as $param)
+                    {
+                        if ($param[0] == 'limit') { $this->limit = $param[1]; }
+                        if ($param[0] == 'offset') { $this->offset = $param[1]; }
+                    }
+                }
+            }
+        }
+        
+        return $this->get(null, $url);
     }
     
     /**
@@ -228,7 +307,7 @@ class PokeAPI
     {
         if (!$this->resource)
         {
-            throw new PokeApiException('A PokeAPI resource is needed in order to access the API.');
+            throw new PokeApiException('A PokeAPI resource is needed in order to access the API.', 500);
         }
         
         if (!$search)
@@ -266,6 +345,42 @@ class PokeAPI
             $result = require __DIR__ . "/config/{$file}.php";
             
             if ($key) { $result = $result[$key]; }
+        }
+        else
+        {
+            throw new PokeApiFileException('Impossible to get the wanted configuration because ' . __DIR__ . "/config/{$file}.php does not exist.", 500);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Gets values from a language file.
+     *
+     * @param string $search Where to search.
+     *
+     * @return mixed
+     */
+    public static function lang(string $search)
+    {
+        /*$path = explode('.', $config);
+        $file = $path[0];
+        $key = (isset($path[1]))
+            ? $path[1]
+            : null;*/
+        $file = PokeAPI::config('lang.lang');
+        $result = null;
+        
+        if (file_exists(__DIR__ . "/lang/{$file}.php"))
+        {
+            $result = require __DIR__ . "/lang/{$file}.php";
+            
+            if (isset($result[$search])) { $result = $result[$search]; }
+            else { $result = $search; }
+        }
+        else
+        {
+            throw new PokeApiFileException('Impossible to get the wanted translation because ' . __DIR__ . "/lang/{$file}.php does not exist.", 500);
         }
         
         return $result;

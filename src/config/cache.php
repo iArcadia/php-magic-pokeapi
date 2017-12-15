@@ -34,4 +34,14 @@ return
      * Value type: string
      */
     'FileCache::storage_path' => 'cache',
+    
+    /*
+     * The extension used by cached files.
+     *
+     * Only for: FileCache
+     * Value type: string
+     * - json
+     * - yaml
+     */
+    'FileCache::ext' => 'json',
 ];
