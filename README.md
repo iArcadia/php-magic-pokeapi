@@ -48,7 +48,7 @@ You must specify the resource that you want to look for! Use the ```resource()``
 ```php
 $api->resource('pokemon');
 // or (and the recommended one)
-$api->resource(PokeAPI::RESOURCE_POKEMON);
+$api->resource(Constant::RESOURCE_POKEMON);
 ```
 
 The ```PokeAPI``` class provides constants for all resources. It could be a good idea to use them instead of direct string.
@@ -118,18 +118,6 @@ You can specify many URLs with many arguments.
 $api->raw('/ability/', 'https://www.pokeapi.co/api/v2/item/203');
 ```
 
-### Forcing the cache update
-
-If a reason, you want to force the update of a cached file, use the ```cacheForcing()``` method or directly the setter.
-
-```php
-$api->cacheForcing(true);
-// or
-$api->cacheForcing = true;
-```
-
-It will update the cache for the next request ONLY.
-
 ## Tips
 
 ### Chaining methods
@@ -140,7 +128,7 @@ Thanks to the power of the POO, you can quickly set up options between two diffe
 // for endpoint
 $api->limit(20)->offset(60)->resource(PokeAPI::RESOURCE_ITEM)->get();
 // for resource details
-$api->resource(PokeAPI::RESOURCE_ITEM)->find('potion');
+$api->resource(Constant::RESOURCE_ITEM)->find('potion');
 ```
 
 ### Constructor options
@@ -152,7 +140,7 @@ $api = new PokeApi(
 [
     'limit' => 20,
     'offset' => 0, // works with "skip" too
-    'resource' => PokeAPI::RESOURCE_CONTEST_EFFECT
+    'resource' => Constant::RESOURCE_CONTEST_EFFECT
 ]);
 ```
 
@@ -164,15 +152,12 @@ If you decide to activate the automatic resource name translation (in the ```con
 
 ```php
 // Charizard in french will be translated to:
-// $api->resource(PokeAPI::RESOURCE_POKEMON)->find('charizard');
-$api->resource(PokeAPI::RESOURCE_POKEMON)->find('dracaufeu');
+// $api->resource(Constant::RESOURCE_POKEMON)->find('charizard');
+$api->resource(Constant::RESOURCE_POKEMON)->find('dracaufeu');
 
 // Nidoqueen in korean will be translated to:
-// $api->resource(PokeAPI::RESOURCE_POKEMON)->find('nidoqueen');
-$api->resource(PokeAPI::RESOURCE_POKEMON)->find('니드퀸');
-```
-
-Bonus: even if you use this feature, all english will continue to work!
+// $api->resource(Constant::RESOURCE_POKEMON)->find('nidoqueen');
+$api->resource(Constant::RESOURCE_POKEMON)->find('니드퀸');
 
 ### Procedural functions
 

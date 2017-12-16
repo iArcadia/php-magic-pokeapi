@@ -51,7 +51,8 @@ class Lang
         }
         else
         {
-            throw new PokeApiFileException('Impossible to get the wanted translation because ' . dirname(__DIR__) .  "/lang/{$file}.php does not exist.", 500);
+            // envoyer warning
+            //throw new PokeApiFileException('Impossible to get the wanted translation because ' . dirname(__DIR__) .  "/lang/{$file}.php does not exist.", 500);
         }
         
         return $result;
@@ -67,7 +68,8 @@ class Lang
      */
     public static function search(string $file, string $search)
     {
-        $langs = array_keys(self::get($file));
+        $langData = self::get($file);
+        $langs = ($langData) ? array_keys(self::get($file)) : [];
         
         foreach ($langs as $lang)
         {

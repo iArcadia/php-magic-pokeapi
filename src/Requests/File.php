@@ -10,17 +10,17 @@ use iArcadia\MagicPokeAPI\PokeAPI;
  * @author Kévin Bibollet <bibollet.kevin@gmail.com>
  * @license MIT
  */
-class File
+class File extends Request
 {
     /**
      * Sends a HTML request and gets a data response.
      *
-     * @param PokeAPI $api The API instance which called this method.
+     * @param string $url
      *
      * @return string
      */
-    public static function send(PokeAPI $api)
+    public static function send(string $url): string
     {
-        return file_get_contents($api->url());
+        return file_get_contents($url);
     }
 }

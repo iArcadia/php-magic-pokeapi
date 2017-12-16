@@ -13,12 +13,12 @@ return
     'use' => true,
     
     /*
-     * The caching system (or class) your want to use.
+     * The caching system your want to use.
      *
      * Value type: string
-     * - 'FileCache' for storing parsed data in files.
+     * - 'file' for storing parsed data in files.
      */
-    'class' => 'FileCache',
+    'system' => 'file',
     
     /*
      * The amount of time before a file update.

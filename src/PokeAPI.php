@@ -4,8 +4,12 @@ namespace iArcadia\MagicPokeAPI;
 
 use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
 
+use iArcadia\MagicPokeAPI\Requests\Request;
+use iArcadia\MagicPokeAPI\Cache\Cache;
+
 use iArcadia\MagicPokeAPI\Helpers\URLBuilder;
 use iArcadia\MagicPokeAPI\Helpers\Config;
+use iArcadia\MagicPokeAPI\Helpers\Constant;
 use iArcadia\MagicPokeAPI\Helpers\Lang;
 
 /**
@@ -20,57 +24,6 @@ class PokeAPI
     public $cacheForcing = false;
     
     protected $URLBuilder;
-    
-    const RESOURCE_BERRY = 'berry';
-    const RESOURCE_BERRY_FIRMNESS = 'berry-firmness';
-    const RESOURCE_BERRY_FLAVOR = 'berry-flavor';
-    const RESOURCE_CONTEST_TYPE = 'content-type';
-    const RESOURCE_CONTEST_EFFECT = 'contest-effect';
-    const RESOURCE_SUPER_CONTEST_EFFECT = 'super-contest-effect';
-    const RESOURCE_ENCOUNTER_METHOD = 'encounter-method';
-    const RESOURCE_ENCOUNTER_CONDITION = 'encounter-condition';
-    const RESOURCE_ENCOUNTER_CONDITION_VALUE = 'encounter-condition-value';
-    const RESOURCE_EVOLUTION_CHAIN = 'evolution-chain';
-    const RESOURCE_EVOLUTION_TRIGGER = 'evolution-trigger';
-    const RESOURCE_GENERATION = 'generation';
-    const RESOURCE_POKEDEX = 'pokedex';
-    const RESOURCE_VERSION = 'version';
-    const RESOURCE_VERSION_GROUP = 'version-group';
-    const RESOURCE_ITEM = 'item';
-    const RESOURCE_ITEM_ATTRIBUTE = 'item-attribute';
-    const RESOURCE_ITEM_CATEGORY = 'item-category';
-    const RESOURCE_ITEM_FLING_EFFECT = 'item-fling-effect';
-    const RESOURCE_ITEM_POCKET = 'item-pocket';
-    const RESOURCE_MACHINE = 'machine';
-    const RESOURCE_MOVE = 'move';
-    const RESOURCE_MOVE_AILMENT = 'move-ailment';
-    const RESOURCE_MOVE_BATTLE_STYLE = 'move-battle-style';
-    const RESOURCE_MOVE_CATEGORY = 'move-category';
-    const RESOURCE_MOVE_DAMAGE_CLASS = 'move-damage-class';
-    const RESOURCE_MOVE_LEARN_METHOD = 'move-learn-method';
-    const RESOURCE_MOVE_TARGET = 'move-target';
-    const RESOURCE_LOCATION = 'location';
-    const RESOURCE_LOCATION_AREA = 'location-area';
-    const RESOURCE_PAL_PARK_AREA = 'pal-park-area';
-    const RESOURCE_REGION = 'region';
-    const RESOURCE_ABILITY = 'ability';
-    const RESOURCE_CHARACTERISTIC = 'characteristic';
-    const RESOURCE_EGG_GROUP = 'egg-group';
-    const RESOURCE_GENDER = 'gender';
-    const RESOURCE_GROWTH_RATE = 'growth-rate';
-    const RESOURCE_NATURE = 'nature';
-    const RESOURCE_POKEATHLON_STAT = 'pokeathlon-stat';
-    const RESOURCE_POKEMON = 'pokemon';
-    const RESOURCE_POKEMON_COLOR = 'pokemon-color';
-    const RESOURCE_POKEMON_FORM = 'pokemon-form';
-    const RESOURCE_POKEMON_HABITAT = 'pokemon-habitat';
-    const RESOURCE_POKEMON_SHAPE = 'pokemon-shape';
-    const RESOURCE_POKEMON_SPECIES = 'pokemon-species';
-    const RESOURCE_STAT = 'stat';
-    const RESOURCE_TYPE = 'type';
-    const RESOURCE_LANGUAGE = 'language';
-    
-    const API_URL = 'https://pokeapi.co/api/v2/';
     
     /**
      * Constructor method.
@@ -202,26 +155,6 @@ class PokeAPI
     }
     
     /**
-     * Gets the class used for caching system.
-     *
-     * @return string
-     */
-    public static function CacheSystem()
-    {
-        return 'iArcadia\MagicPokeAPI\Cache\\' . Config::get('cache.class');
-    }
-    
-    /**
-     * Gets the class used for request system.
-     *
-     * @return string
-     */
-    public static function RequestSystem()
-    {
-        return 'iArcadia\MagicPokeAPI\Requests\\' . Config::get('request.class');
-    }
-    
-    /**
      * Gets the asked data from the API server, endpoint or specific item.
      *
      * @param string|null $search If provided, it will build an URL for a specific item.
@@ -244,20 +177,20 @@ class PokeAPI
         
         if (Config::get('cache.use'))
         {
-            $response = PokeAPI::CacheSystem()::get($this);
+            $response = Cache::get($this->url);
             
             if (!$response)
             {
-                $response = PokeAPI::RequestSystem()::send($this);
-                PokeAPI::CacheSystem()::cache($this, $response);
+                $response = Request::send($this->url);
+                Cache::cache($this->url, $response);
             }
         }
         else
         {
-            $response = PokeAPI::RequestSystem()::send($this);
+            $response = Request::send($this->url);
         }
         
-        $this->cacheForcing(false);
+        $this->cacheForcing = false;;
         
         return (is_string($response)) ? json_decode($response) : $response;
     }
@@ -290,7 +223,7 @@ class PokeAPI
     public function raw(...$urls)
     {
         if (empty($urls)) { return null; }
-        if (sizeof($urls) === 1) { return $this->get(null, $urls[0]); }
+        else if (sizeof($urls) === 1) { return $this->get(null, $urls[0]); }
         else { return $this->manyRaw($urls); }
     }
     
