@@ -6,6 +6,7 @@ use iArcadia\MagicPokeAPI\Exceptions\PokeApiException;
 
 use iArcadia\MagicPokeAPI\Helpers\URLBuilder;
 use iArcadia\MagicPokeAPI\Helpers\Config;
+use iArcadia\MagicPokeAPI\Helpers\Lang;
 
 /**
  * Constructs URL and HTTP Requests in order to get data.
@@ -270,9 +271,12 @@ class PokeAPI
      */
     public function find($search)
     {
-        if (Config::get('lang.use'))
+        if (Lang::isUsed())
         {
-            $search = PokeAPI::lang($search);
+            $resource = $this->resource;
+            $trans = Lang::search($resource, $search);
+            
+            if ($trans) { $search = $trans; }
         }
         
         return $this->get($search);
@@ -307,37 +311,5 @@ class PokeAPI
         }
         
         return $results;
-    }
-    
-    /**
-     * Gets values from a language file.
-     *
-     * @param string $search Where to search.
-     *
-     * @return mixed
-     */
-    public static function lang(string $search)
-    {
-        /*$path = explode('.', $config);
-        $file = $path[0];
-        $key = (isset($path[1]))
-            ? $path[1]
-            : null;*/
-        $file = Config::get('lang.lang');
-        $result = null;
-        
-        if (file_exists(__DIR__ . "/lang/{$file}.php"))
-        {
-            $result = require __DIR__ . "/lang/{$file}.php";
-            
-            if (isset($result[$search])) { $result = $result[$search]; }
-            else { $result = $search; }
-        }
-        else
-        {
-            throw new PokeApiFileException('Impossible to get the wanted translation because ' . __DIR__ . "/lang/{$file}.php does not exist.", 500);
-        }
-        
-        return $result;
     }
 }

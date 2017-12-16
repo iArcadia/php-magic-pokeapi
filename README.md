@@ -29,7 +29,7 @@ First of all, you need to check files into the ```config``` folder.
 
 Please, respect the comments written in these files.
 
-## Usage
+## Usage overview
 
 ### First step
 
@@ -120,10 +120,12 @@ $api->raw('/ability/', 'https://www.pokeapi.co/api/v2/item/203');
 
 ### Forcing the cache update
 
-If a reason, you want to force the update of a cached file, use the ```cacheForcing()``` method.
+If a reason, you want to force the update of a cached file, use the ```cacheForcing()``` method or directly the setter.
 
 ```php
 $api->cacheForcing(true);
+// or
+$api->cacheForcing = true;
 ```
 
 It will update the cache for the next request ONLY.
@@ -171,6 +173,17 @@ $api->resource(PokeAPI::RESOURCE_POKEMON)->find('니드퀸');
 ```
 
 Bonus: even if you use this feature, all english will continue to work!
+
+### Procedural functions
+
+Maybe you don't like POO? No problem, a helper file exists and wraps for you most of MagicPokeAPI classes!
+
+```php
+// getting pokemon endpoint from 30 to 35:
+magicpokeapi_get('pokemon', 5, 30);
+// getting Johto region resource:
+magicpokeapi_find('region', 'johto');
+```
 
 ## CHANGELOGS
 

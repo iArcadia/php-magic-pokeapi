@@ -44,7 +44,7 @@ class Config
                 foreach ($keys as $key)
                 {
                     if (isset($result[$key])) { $result = $result[$key]; }
-                    else { break; }
+                    else { $result = null; break; }
                 }
             }
         }

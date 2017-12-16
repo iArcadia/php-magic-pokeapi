@@ -1,8 +1,26 @@
 ## CHANGELOGS
 
+### v2.0.0 | work in progress
+
+**VERSION 2 IS NOT RETROCOMPATIBLE WITH <= 1.2.0 VERSIONS, PLEASE CHECK WHAT METHODS HAS BEEN REMOVED**
+
+#### Features
+
+- Automatic resource name translation now searches through all available languages (so ```config/lang.php``` has not ```lang``` attribute anymore).
+
+- Add procedural helper functions which wrap most of POO ones.
+```php
+// Getting Charizard resource:
+magicpokeapi_find(PokeAPI::RESOURCE_POKEMON, 'charizard');
+```
+
+#### Other
+
+- Refactor a loooot of files
+
 ### v1.2.0 | 2017-12-15
 
-#### PokeAPI
+#### Features
 
 - Add multi requests in one method using direct URLs
 ```php
@@ -18,7 +36,7 @@ $api->raw('pokemon/151', 'https://www.pokeapi.co/api/v2/pokemon/charizard');
 
 ### v1.1.0 | 2017-12-15
 
-#### PokeAPI
+#### Features
 
 - Add recache forcing
 ```php
@@ -37,8 +55,6 @@ $api->raw('https://www.pokeapi.co/api/v2/item/?limit=5&offset=120');
 // Getting charizard information using its french name:
 $api->resource(PokeAPI::RESOURCE_POKEMON)->find('dracaufeu');
 ```
-
-#### FileCache
 
 - Add cache clearing
 ```php
