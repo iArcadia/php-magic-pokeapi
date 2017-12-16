@@ -20,9 +20,6 @@ use iArcadia\MagicPokeAPI\Helpers\Lang;
  */
 class PokeAPI
 {
-    /** @var bool If the next request will force the update of cache. */
-    public $cacheForcing = false;
-    
     protected $URLBuilder;
     
     /**
@@ -143,18 +140,6 @@ class PokeAPI
     }
     
     /**
-     * Sets the forcing of the cache update for the next request.
-     *
-     * @return PokeAPI
-     */
-    public function cacheForcing(bool $force = null)
-    {
-        if ($force !== null) { $this->cacheForcing = $force; }
-        
-        return ($force !== null) ? $this : $this->cacheForcing;
-    }
-    
-    /**
      * Gets the asked data from the API server, endpoint or specific item.
      *
      * @param string|null $search If provided, it will build an URL for a specific item.
@@ -189,8 +174,6 @@ class PokeAPI
         {
             $response = Request::send($this->url);
         }
-        
-        $this->cacheForcing = false;;
         
         return (is_string($response)) ? json_decode($response) : $response;
     }
